@@ -1,0 +1,97 @@
+- name: Configure webserver with phonex framework
+  hosts: webservers
+  vars: 
+    working_dir: "{{ ansible_env.HOME }}/tmp"
+    erlang_version: 18.3
+    erlang_src_dir: "otp_src_{{ erlang_version }}"
+    erlang_url: "http://erlang.org/download/{{ erlang_src_dir }}.tar.gz"
+    elixir_version: 1.2.5
+    elixir_src_dir: "elixir-{{ elixir_version }}"
+    elixir_url: "https://github.com/elixir-lang/elixir/archive/v{{ elixir_version }}.tar.gz"
+    proj_name: hello_phoenix
+    env_home: "{{ ansible_env.HOME }}/{{ proj_name }}"
+
+  tasks:
+    - name: install yum packages
+    #yum: name="{{ item }}" state=latest
+      yum: name="{{ item }}" state=present
+      sudo: True
+      with_items:
+        - nginx
+        - ncurses
+        - ncurses-devel
+        - "@Development tools"
+        - openssl
+        - openssl-devel
+        - fop
+        - java-1.6.0-openjdk-devel
+        - unixODBC
+        - unixODBC-devel
+
+    - name: "ensure working_directory exists"
+      file: dest="{{ working_dir }}" state=directory
+
+    - name: "get erlang src file stat"
+      stat: path="{{ working_dir }}/{{ erlang_src_dir }}.tar.gz"
+      register: erlang_src
+    - name: "ensure erlang src file exists"
+      get_url: url={{ erlang_url }} dest="{{ working_dir }}/{{ erlang_src_dir }}.tar.gz"
+      when: erlang_src.stat.exists != true
+    - name: "get elixir src file stat"
+      stat: path="{{ working_dir }}/{{ elixir_src_dir }}.tar.gz"
+      register: elixir_src
+    - name: "ensure elixir src file exists"
+      get_url: url={{ elixir_url }} dest="{{ working_dir }}/{{ elixir_src_dir}}.tar.gz" validate_certs=no
+      when: elixir_src.stat.exists != true
+
+    - name: "extract erlang src file"
+      command: >
+        tar zxf {{ erlang_src_dir }}.tar.gz
+        chdir={{ working_dir }}
+        creates={{ erlang_src_dir }}
+
+    - name: "run configure erlang"
+      command: >
+        ./configure
+        chdir={{ working_dir }}/{{ erlang_src_dir }}
+        creates=config.log
+
+    - name: "make erlang"
+      command: >
+        make
+        chdir={{ working_dir }}/{{ erlang_src_dir }}
+        creates=bootstrap/lib
+
+    - name: "check erlang is installed"
+      stat: path=/usr/local/bin/erl
+      register: erl_command
+
+    - name: "make install erlang"
+      sudo: True
+      command: >
+        make install
+        chdir={{ working_dir }}/{{ erlang_src_dir }}
+      when: erl_command.stat.exists != true
+
+    - name: "extract elixir src file"
+      command: >
+        tar zxf {{ elixir_src_dir }}.tar.gz
+        chdir={{ working_dir }}
+        creates={{ elixir_src_dir }}
+
+#    - name: "make elixir"
+#      command: >
+#        make
+#        chdir={{ working_dir }}/{{ elixir_src_dir }}
+
+    - name: "activate elixir command"
+      sudo: True
+      file: >
+        dest=/usr/local/bin/{{ item }}
+        src={{ working_dir }}/{{ elixir_src_dir }}/bin/iex
+        state=link
+      with_items:
+        - elixir
+        - elixirc
+        - iex
+        - mix
