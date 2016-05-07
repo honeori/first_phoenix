@@ -8,8 +8,15 @@
     elixir_version: 1.2.5
     elixir_src_dir: "elixir-{{ elixir_version }}"
     elixir_url: "https://github.com/elixir-lang/elixir/archive/v{{ elixir_version }}.tar.gz"
+    node_version: 6.1.0
+    node_bin_dir: "node-v{{ node_version }}-linux-x64"
+    node_url: "https://nodejs.org/dist/v{{ node_version }}/{{ node_bin_dir }}.tar.xz"
+    inotify_version: 3.14
+    inotify_src_dir: "inotify-tools-{{ inotify_version }}"
+    inotify_url: http://github.com/downloads/rvoicilas/inotify-tools/{{ inotify_src_dir }}.tar.gz
     proj_name: hello_phoenix
     env_home: "{{ ansible_env.HOME }}/{{ proj_name }}"
+
 
   tasks:
     - name: install yum packages
@@ -27,6 +34,7 @@
         - java-1.6.0-openjdk-devel
         - unixODBC
         - unixODBC-devel
+        - postgresql
 
     - name: "ensure working_directory exists"
       file: dest="{{ working_dir }}" state=directory
@@ -88,10 +96,35 @@
       sudo: True
       file: >
         dest=/usr/local/bin/{{ item }}
-        src={{ working_dir }}/{{ elixir_src_dir }}/bin/iex
+        src={{ working_dir }}/{{ elixir_src_dir }}/bin/{{ item }}
         state=link
       with_items:
         - elixir
         - elixirc
         - iex
         - mix
+
+    - name: "update mix"
+      command: mix local.hex --force
+
+    - name: "install the Phoenix Mix archive"
+      command: mix archive.install https://github.com/phoenixframework/archives/raw/master/phoenix_new.ez --force
+
+    - name: "download node binary archive"
+      get_url: url={{ node_url }} dest="{{ working_dir }}/{{ node_bin_dir }}.tar.gz" validate_certs=no
+
+    - name: "extract node binary archive"
+      command: >
+        tar Jxf {{ node_bin_dir }}.tar.gz
+        chdir={{ working_dir }}
+
+    - name: "activate node"
+      sudo: True
+      file: >
+        dest=/usr/local/bin/{{ item }}
+        src={{ working_dir }}/{{ node_bin_dir }}/bin/{{ item }}
+        state=link
+      with_items:
+        - node
+        - npm
+
