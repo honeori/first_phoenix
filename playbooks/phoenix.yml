@@ -34,7 +34,7 @@
         - java-1.6.0-openjdk-devel
         - unixODBC
         - unixODBC-devel
-        - postgresql
+        - postgresql-server
 
     - name: "ensure working_directory exists"
       file: dest="{{ working_dir }}" state=directory
