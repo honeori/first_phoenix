@@ -10,7 +10,7 @@ defmodule MemoPhoenix do
       # Start the endpoint when the application starts
       supervisor(MemoPhoenix.Endpoint, []),
       # Start the Ecto repository
-      supervisor(MemoPhoenix.Repo, []),
+      #supervisor(MemoPhoenix.Repo, []),
       # Here you could define other workers and supervisors as children
       # worker(MemoPhoenix.Worker, [arg1, arg2, arg3]),
     ]
