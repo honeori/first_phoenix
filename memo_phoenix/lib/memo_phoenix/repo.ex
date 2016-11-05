@@ -5,9 +5,9 @@ defmodule MemoPhoenix.Repo do
   #""
 
   def all(MemoPhoenix.User) do
-    [%MemoPhoenix.User{id: "1",name: "jose", username: "josevalim", password: "elixir"},
-     %MemoPhoenix.User{id: "2",name: "jose", username: "josevalim", password: "elixir"},
-     %MemoPhoenix.User{id: "3",name: "jose", username: "josevalim", password: "elixir"}]
+    [%MemoPhoenix.User{id: "1",name: "honeori jose", username: "josevalim", password: "elixir"},
+     %MemoPhoenix.User{id: "2",name: "hoge jose", username: "josevalim", password: "elixir"},
+     %MemoPhoenix.User{id: "3",name: "fuga jose", username: "josevalim", password: "elixir"}]
   end
 
   def all(_module), do: []

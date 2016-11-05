@@ -16,13 +16,8 @@ defmodule MemoPhoenix.Router do
   scope "/", MemoPhoenix do
     pipe_through :browser # Use the default browser stack
 
-    get "/", PageController, :index
-    get "/hello", HelloController, :index
-    get "/hello/:messenger", HelloController, :show
+    get "/", HelloController, :index
+    get "/users", UserController, :index
+    get "/users/:user", UserController, :show
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", MemoPhoenix do
-  #   pipe_through :api
-  # end
 end
