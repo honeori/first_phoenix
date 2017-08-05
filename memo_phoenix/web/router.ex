@@ -17,7 +17,6 @@ defmodule MemoPhoenix.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", HelloController, :index
-    get "/users", UserController, :index
-    get "/users/:user", UserController, :show
+    resources "/users", UserController, only: [:index, :show, :new, :create]
   end
 end
