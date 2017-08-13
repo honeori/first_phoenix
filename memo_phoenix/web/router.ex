@@ -19,5 +19,6 @@ defmodule MemoPhoenix.Router do
 
     get "/", HelloController, :index
     resources "/users", UserController, only: [:index, :show, :new, :create]
+    resources "/sessions", SessionController, only: [:new, :create, :delete]
   end
 end
