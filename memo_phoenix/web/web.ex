@@ -36,6 +36,7 @@ defmodule MemoPhoenix.Web do
 
       import MemoPhoenix.Router.Helpers
       import MemoPhoenix.Gettext
+      import MemoPhoenix.Auth, only: [authenticate_user: 2]
     end
   end
 
@@ -58,6 +59,8 @@ defmodule MemoPhoenix.Web do
   def router do
     quote do
       use Phoenix.Router
+
+      import MemoPhoenix.Auth, only: [authenticate_user: 2]
     end
   end
 

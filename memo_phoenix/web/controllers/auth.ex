@@ -1,6 +1,9 @@
 defmodule MemoPhoenix.Auth do
   import Plug.Conn
   import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
+  import Phoenix.Controller
+  alias MemoPhoenix.Router.Helpers
+
 
   def init(opts) do
     Keyword.fetch!(opts, :repo)
@@ -36,6 +39,17 @@ defmodule MemoPhoenix.Auth do
 
   def logout(conn) do
     configure_session(conn, drop: true)
+  end
+
+  def authenticate_user(conn, _opts) do
+    if conn.assigns.current_user do
+      conn
+    else 
+     conn
+     |> put_flash(:error, "Your must be logged in to access that page ")
+     |> redirect(to: Helpers.hello_path(conn, :index))
+     |> halt()
+    end
   end
 
 end
